@@ -1,0 +1,16 @@
+@charset "utf-8";
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  display: block;
+}
+
+#data {
+	display: block;
+	width: 40em;
+	height: 10em;
+}
