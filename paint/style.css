@@ -5,6 +5,24 @@ html, body {
   padding: 0;
 }
 
+html, body, main {
+	height: 100%;
+}
+
+.wrap {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+	justify-content: center;
+}
+
+#color {
+	margin-bottom: 20px;
+}
+
+main {
+}
+
 canvas {
   display: block;
 }
