@@ -2,6 +2,8 @@
 let px = 0;
 let py = 0;
 
+let sw = 5; // 線の太さ
+
 let colorInput; // カラーピッカーを入れる変数
 let dataInput; // テキストエリアを入れる変数
 
@@ -21,7 +23,13 @@ function setup() {
 }
 
 function draw() {
-	strokeWeight(10); // 線の太さ
+	if (keyIsDown(70) && sw < 30) { // F キー
+		sw++; // 太くする
+	} else if (keyIsDown(68) && sw > 1) { // D キー
+		sw--; // 細くする
+	}
+
+	strokeWeight(sw); // 線の太さ
 
 	// マウスボタンを押している間
 	if (mouseIsPressed) {
