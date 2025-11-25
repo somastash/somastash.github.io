@@ -1,0 +1,13 @@
+@charset "utf-8";
+
+body {
+	font-size: 16px;
+	font-family: Helvetica, sans-serif;
+	line-height: 1.75;
+	background-color: #402878;
+	color: white;
+}
+
+a {
+	color: #e8c93d;
+}
