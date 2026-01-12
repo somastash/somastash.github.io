@@ -5,6 +5,10 @@ html, body {
   padding: 0;
 }
 
+body {
+  font-family: Helvetica, sans-serif;
+}
+
 canvas {
   display: block;
 }
@@ -22,6 +26,12 @@ canvas {
   margin-top: 1em;
 }
 
-.ui {
-
+#shapes {
+  width: 12em;
+  height: 24em;
 }
+
+#width, #height {
+  width: 6em;
+}
+

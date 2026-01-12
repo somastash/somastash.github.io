@@ -7,17 +7,39 @@ let currShape;
 
 let mode = 'idle';
 
-let iShape, iClear;
+let iWidth, iHeight, iShape, iClear;
 
 function setup() {
   cnv = createCanvas(400, 400);
   cStroke = color(0, 0, 0);
   cFill = color(255, 255, 255, 127);
 
-  iShape = select('#shape');
+  // canvas resizer
+  iWidth = select('#width');
+  iWidth.value(width);
+  iWidth.changed(ev => {
+    let w = parseInt(iWidth.value());
+    if (!isNaN(w)) {
+      w = constrain(ceil(w), 240, 1028);
+      cnv.resize(w, height);
+    }
+    iWidth.value(width);
+  });
+  iHeight = select('#height');
+  iHeight.value(height);
+  iHeight.changed(ev => {
+    let h = parseInt(iHeight.value());
+    if (!isNaN(h)) {
+      h = constrain(ceil(h), 240, 1028);
+      cnv.resize(width, h);
+    }
+    iHeight.value(height);
+  });
+
+  iShape = select('#shapes');
 
   iClear = select('#clear');
-  iClear.mousePressed(clearDots);
+  iClear.mousePressed(clearShapes);
 }
 
 function draw() {
@@ -28,6 +50,11 @@ function draw() {
     drawShape(shape);
   }
   if (currShape) drawShape(currShape, true);
+
+  fill(0, 0, 0);
+  noStroke();
+  textAlign(RIGHT);
+  text(`By Satoshi Soma (github.com/amekusa)`, width - 20, height - 20);
 }
 
 function drawShape(dots, isCurrent = false) {
@@ -70,7 +97,6 @@ function keyTyped() {
   case 's':
     switch (mode) {
     case 'shaping':
-      mode = 'idle';
       closeShape();
       break;
     }
@@ -79,7 +105,16 @@ function keyTyped() {
 }
 
 function closeShape() {
+  mode = 'idle';
   shapes.push(currShape);
+  currShape = undefined;
+  updateTextarea();
+}
+
+
+function clearShapes() {
+  mode = 'idle';
+  shapes.length = 0;
   currShape = undefined;
   updateTextarea();
 }
@@ -98,10 +133,4 @@ function updateTextarea() {
   }
   lines.push(`]`);
   iShape.value(lines.join('\n'));
-}
-
-function clearDots() {
-  shapes.length = 0;
-  currShape = undefined;
-  updateTextarea();
 }
