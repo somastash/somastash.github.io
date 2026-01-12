@@ -1,0 +1,27 @@
+@charset "utf-8";
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  display: block;
+}
+
+.wrap {
+  display: flex;
+  gap: 1.5em;
+  padding: 1.5em;
+}
+
+.rows > * {
+  display: block;
+}
+.rows > * + * {
+  margin-top: 1em;
+}
+
+.ui {
+
+}
