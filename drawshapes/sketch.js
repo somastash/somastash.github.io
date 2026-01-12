@@ -45,14 +45,22 @@ function setup() {
 function draw() {
   background(220);
 
+  // draw shapes
   for (let i = 0; i < shapes.length; i++) {
     let shape = shapes[i];
     drawShape(shape);
   }
-  if (currShape) drawShape(currShape, true);
 
-  fill(0, 0, 0);
-  noStroke();
+  switch (mode) {
+  case 'shaping':
+    fill(0, 0, 0); noStroke();
+    textAlign(LEFT);
+    text(`S: close shape`, 20, 30);
+    if (currShape) drawShape(currShape, true);
+    break;
+  }
+
+  fill(0, 0, 0); noStroke();
   textAlign(RIGHT);
   text(`By Satoshi Soma (github.com/amekusa)`, width - 20, height - 20);
 }
