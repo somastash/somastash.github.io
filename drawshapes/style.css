@@ -1,37 +1,37 @@
 @charset "utf-8";
 
 html, body {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 body {
-  font-family: Helvetica, sans-serif;
+	font-family: Helvetica, sans-serif;
 }
 
 canvas {
-  display: block;
+	display: block;
 }
 
 .wrap {
-  display: flex;
-  gap: 1.5em;
-  padding: 1.5em;
+	display: flex;
+	gap: 1.5em;
+	padding: 1.5em;
 }
 
 .rows > * {
-  display: block;
+	display: block;
 }
 .rows > * + * {
-  margin-top: 1em;
+	margin-top: 1em;
 }
 
 #shapes {
-  width: 12em;
-  height: 24em;
+	width: 12em;
+	height: 24em;
 }
 
 #width, #height {
-  width: 6em;
+	width: 6em;
 }
 
