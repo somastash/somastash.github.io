@@ -54,6 +54,10 @@ main canvas {
 	margin-top: var(--gap-y);
 }
 
+.ui.left {
+	flex-shrink: 0;
+	width: 128px;
+}
 .toolbar {
 	text-align: right;
 	margin-top: var(--gap-m);
