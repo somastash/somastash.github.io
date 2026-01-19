@@ -141,8 +141,14 @@ function setup() {
 		updateTextarea();
 	});
 
+	select('#reset-camera').mousePressed(ev => {
+		resetCamera();
+	});
+
 	select('#clear').mousePressed(ev => {
-		if (confirm(`Clear all shapes?`)) clearShapes();
+		if (!confirm(`Clear all shapes?`)) return;
+		clearShapes();
+		resetCamera();
 	});
 
 	let iWidth = select('#width');
@@ -207,7 +213,7 @@ function drawShape(verts, isCurrent = false) {
 }
 
 function updateMouse() {
-	let margin = 20;
+	let margin = 15;
 	let x = mouseX;
 	let y = mouseY;
 	if (x < -margin || x > width + margin || y < -margin || y > height + margin) return false; // off limits
@@ -227,6 +233,12 @@ function keyTyped() {
 
 function isKey(name) {
 	return keyIsDown(keyCodes[name]);
+}
+
+function resetCamera() {
+	cam.pos[0] = 0;
+	cam.pos[1] = 0;
+	cam.zoom = 1;
 }
 
 function clearShapes() {

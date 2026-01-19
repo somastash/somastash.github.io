@@ -16,8 +16,9 @@ body {
 	line-height: 1.75;
 }
 
-canvas {
+main canvas {
 	display: block;
+	border-radius: .5em;
 }
 
 .mono {
@@ -51,6 +52,14 @@ canvas {
 }
 .rows > * + * {
 	margin-top: var(--gap-y);
+}
+
+.toolbar {
+	text-align: right;
+	margin-top: var(--gap-m);
+}
+.toolbar > * + * {
+	margin-left: var(--gap-s);
 }
 
 #shapes {
