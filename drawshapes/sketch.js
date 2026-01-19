@@ -32,10 +32,13 @@ let modes = new States({
 			} else if (isKey('d')) {
 				cam.pos[1] += spd;
 			}
+
+			let zoomMin = .25;
+			let zoomMax = 3;
 			if (isKey('r')) {
-				cam.zoom += spd / 100;
+				cam.zoom = min(cam.zoom + spd / 100, zoomMax);
 			} else if (isKey('w')) {
-				cam.zoom -= spd / 100;
+				cam.zoom = max(cam.zoom - spd / 100, zoomMin);
 			}
 		},
 		drawShapes() {
@@ -118,7 +121,7 @@ let modes = new States({
 			noStroke();
 			fill(0, 0, 0);
 			textAlign(LEFT);
-			text(`S: close shape\naaaa`, 20, 30);
+			text(`G: close shape`, 20, 30);
 
 			this.showMode();
 		},
@@ -169,18 +172,7 @@ function setup() {
 
 function draw() {
 	background(220);
-
-	let cx = width / 2;
-	let cy = height / 2;
-
-	// grid
-	push();
-	noFill();
-	stroke(190);
-	strokeWeight(1);
-	line(0, cy, width, cy);
-	line(cx, 0, cx, height);
-	pop();
+	drawGrid();
 
 	modes.curr.draw();
 	modes.update();
@@ -188,6 +180,15 @@ function draw() {
 	fill(0, 0, 0); noStroke();
 	textAlign(RIGHT);
 	text(`By Satoshi Soma (github.com/amekusa)`, width - 20, height - 20);
+}
+
+function drawGrid() {
+	noFill();
+	stroke(190);
+	let x = cam.worldToScreenX(0);
+	let y = cam.worldToScreenY(0);
+	line(x, 0, x, height);
+	line(0, y, width, y);
 }
 
 function drawShape(verts, isCurrent = false) {
