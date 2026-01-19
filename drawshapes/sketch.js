@@ -1,21 +1,148 @@
+import {States} from './States.js';
+import {Camera} from './Cameras.js';
+import {keyCodes} from './keys.util.js';
+
 let cnv;
 let cStroke;
 let cFill;
 
 let shapes = [];
-let currShape;
 
-let mode = 'idle';
+let mouse = [0, 0];
+let cam = new Camera();
+let iShapes;
+let isOneline = false;
 
-let iWidth, iHeight, iShape, iClear;
+let modes = new States({
+	$common: {
+		showMode() {
+			noStroke();
+			fill(0, 0, 0);
+			textAlign(RIGHT);
+			text(`Mode: ${this.$curr.id.toUpperCase()}`, width - 20, 30);
+		},
+		controlCamera(spd = 5) {
+			if (isKey('s')) {
+				cam.pos[0] -= spd;
+			} else if (isKey('f')) {
+				cam.pos[0] += spd;
+			}
+			if (isKey('e')) {
+				cam.pos[1] -= spd;
+			} else if (isKey('d')) {
+				cam.pos[1] += spd;
+			}
+			if (isKey('r')) {
+				cam.zoom += spd / 100;
+			} else if (isKey('w')) {
+				cam.zoom -= spd / 100;
+			}
+		},
+		drawShapes() {
+			for (let i = 0; i < shapes.length; i++) {
+				let s = shapes[i];
+				drawShape(s);
+			}
+		},
+	},
+	normal: {
+		_createShape(x, y) {
+			this.$goto('insert', x, y);
+		},
+		onMouse(ev) {
+			let x = cam.screenToWorldX(mouse[0]);
+			let y = cam.screenToWorldY(mouse[1]);
+			switch (ev) {
+			case 'pressed':
+				this._createShape(x, y);
+				break;
+			}
+		},
+		draw() {
+			this.controlCamera();
+			cam.set();
+			this.drawShapes();
+			cam.unset();
+			this.showMode();
+		},
+	},
+	insert: {
+		setup() {
+			this._clear();
+		},
+		_clear() {
+			this.openShape = [];
+		},
+		_add(x, y) {
+			this.openShape.push(x, y);
+		},
+		_close() {
+			if (!this.openShape.length) return;
+			shapes.push(this.openShape);
+			updateTextarea();
+			this._clear();
+		},
+		onEnter(from, x, y) {
+			this._add(x, y);
+		},
+		onLeave() {
+			this._clear();
+		},
+		onMouse(ev) {
+			let x = cam.screenToWorldX(mouse[0]);
+			let y = cam.screenToWorldY(mouse[1]);
+			switch (ev) {
+			case 'pressed':
+				this._add(x, y);
+				break;
+			}
+		},
+		onKey(ev, key) {
+			switch (ev) {
+			case 'typed':
+				switch (key) {
+				case 'g':
+					this._close();
+					break;
+				}
+				break;
+			}
+		},
+		draw() {
+			this.controlCamera();
+			cam.set();
+			this.drawShapes();
+			drawShape(this.openShape, true);
+			cam.unset();
+
+			noStroke();
+			fill(0, 0, 0);
+			textAlign(LEFT);
+			text(`S: close shape\naaaa`, 20, 30);
+
+			this.showMode();
+		},
+	},
+});
 
 function setup() {
 	cnv = createCanvas(400, 400);
+
 	cStroke = color(0, 0, 0);
 	cFill = color(255, 255, 255, 127);
 
-	// canvas resizer
-	iWidth = select('#width');
+	iShapes = select('#shapes');
+
+	select('#oneline').changed(ev => {
+		isOneline = ev.target.checked;
+		updateTextarea();
+	});
+
+	select('#clear').mousePressed(ev => {
+		if (confirm(`Clear all shapes?`)) clearShapes();
+	});
+
+	let iWidth = select('#width');
 	iWidth.value(width);
 	iWidth.changed(ev => {
 		let w = parseInt(iWidth.value());
@@ -25,7 +152,8 @@ function setup() {
 		}
 		iWidth.value(width);
 	});
-	iHeight = select('#height');
+
+	let iHeight = select('#height');
 	iHeight.value(height);
 	iHeight.changed(ev => {
 		let h = parseInt(iHeight.value());
@@ -36,39 +164,37 @@ function setup() {
 		iHeight.value(height);
 	});
 
-	iShape = select('#shapes');
-
-	iClear = select('#clear');
-	iClear.mousePressed(clearShapes);
+	modes.setup();
 }
 
 function draw() {
 	background(220);
 
-	// draw shapes
-	for (let i = 0; i < shapes.length; i++) {
-		let shape = shapes[i];
-		drawShape(shape);
-	}
+	let cx = width / 2;
+	let cy = height / 2;
 
-	switch (mode) {
-	case 'shaping':
-		fill(0, 0, 0); noStroke();
-		textAlign(LEFT);
-		text(`S: close shape`, 20, 30);
-		if (currShape) drawShape(currShape, true);
-		break;
-	}
+	// grid
+	push();
+	noFill();
+	stroke(190);
+	strokeWeight(1);
+	line(0, cy, width, cy);
+	line(cx, 0, cx, height);
+	pop();
+
+	modes.curr.draw();
+	modes.update();
 
 	fill(0, 0, 0); noStroke();
 	textAlign(RIGHT);
 	text(`By Satoshi Soma (github.com/amekusa)`, width - 20, height - 20);
 }
 
-function drawShape(dots, isCurrent = false) {
+function drawShape(verts, isCurrent = false) {
 	beginShape();
-	for (let i = 0; i < dots.length; i++) {
-		let [x, y] = dots[i];
+	for (let i = 0; i < verts.length; i += 2) {
+		let x = verts[i];
+		let y = verts[i+1];
 		vertex(x, y);
 		noStroke();
 		fill(cStroke);
@@ -79,66 +205,76 @@ function drawShape(dots, isCurrent = false) {
 	endShape(isCurrent ? undefined : CLOSE);
 }
 
-function mousePressed() {
-	let offset = 20;
+function updateMouse() {
+	let margin = 20;
 	let x = mouseX;
 	let y = mouseY;
-	if (
-		x < -offset || x > width+offset ||
-		y < -offset || y > height+offset
-	) return;
+	if (x < -margin || x > width + margin || y < -margin || y > height + margin) return false; // off limits
+	mouse[0] = constrain(x, 0, width);
+	mouse[1] = constrain(y, 0, height);
+	return mouse;
+}
 
-	x = constrain(x, 0, width);
-	y = constrain(y, 0, height);
-
-	switch (mode) {
-	case 'idle':
-		mode = 'shaping';
-		currShape = [];
-		break;
-	}
-	currShape.push([x, y]);
+function mousePressed() {
+	if (!updateMouse()) return;
+	modes.curr.onMouse('pressed');
 }
 
 function keyTyped() {
-	switch (key) {
-	case 's':
-		switch (mode) {
-		case 'shaping':
-			closeShape();
-			break;
-		}
-		break;
-	}
+	modes.curr.onKey('typed', key);
 }
 
-function closeShape() {
-	mode = 'idle';
-	shapes.push(currShape);
-	currShape = undefined;
-	updateTextarea();
+function isKey(name) {
+	return keyIsDown(keyCodes[name]);
 }
-
 
 function clearShapes() {
-	mode = 'idle';
+	modes.setNext('normal');
 	shapes.length = 0;
-	currShape = undefined;
 	updateTextarea();
 }
 
-function updateTextarea() {
+function shapesToText(shapes, opts = {}) {
+	if (!shapes.length) return '';
+
+	let {
+		oneline = false,
+	} = opts;
+
+	let ind, sp, br;
+	if (oneline) {
+		ind = '';
+		sp = '';
+		br = '';
+	} else {
+		ind = '  ';
+		sp = ' ';
+		br = '\n';
+	}
+
 	let lines = [];
 	lines.push(`[`);
 	for (let i = 0; i < shapes.length; i++) {
-		let shape = shapes[i];
-		lines.push(`	[`);
-		for (let j = 0; j < shape.length; j++) {
-			let [x, y] = shape[j];
-			lines.push(`		{x:${x},y:${y}},`);
+		let verts = shapes[i];
+		lines.push(`${ind}[`);
+		for (let j = 0; j < verts.length; j += 2) {
+			lines.push(`${ind}${ind}{${sp}x:${sp}${verts[j]},${sp}y:${sp}${verts[j+1]}${sp}},`);
 		}
-		lines.push(`	],`)
+		lines.push(`${ind}],`)
 	}
 	lines.push(`]`);
-	iShape.value(lines.join('\n'));
+	return lines.join(br);
 }
+
+function updateTextarea() {
+	iShapes.value(shapesToText(shapes, {
+		oneline: isOneline,
+	}));
+}
+
+Object.assign(globalThis, {
+	setup,
+	draw,
+	keyTyped,
+	mousePressed,
+});

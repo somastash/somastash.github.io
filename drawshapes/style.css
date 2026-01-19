@@ -1,5 +1,11 @@
 @charset "utf-8";
 
+:root {
+	--gap-s: .75em;
+	--gap-m: 1.5em;
+	--gap-l: 3em;
+}
+
 html, body {
 	margin: 0;
 	padding: 0;
@@ -7,28 +13,50 @@ html, body {
 
 body {
 	font-family: Helvetica, sans-serif;
+	line-height: 1.75;
 }
 
 canvas {
 	display: block;
 }
 
+.mono {
+	font-family: monospace;
+}
+.mono * {
+	font-family: inherit;
+}
+
 .wrap {
-	display: flex;
-	gap: 1.5em;
 	padding: 1.5em;
 }
 
+.cols {
+	--gap-x: var(--gap-m);
+	display: flex;
+	gap: var(--gap-x);
+}
+.cols .cols {
+	--gap-x: var(--gap-s);
+}
+
+.rows {
+	--gap-y: var(--gap-m);
+}
+.rows .rows {
+	--gap-y: var(--gap-s);
+}
 .rows > * {
 	display: block;
 }
 .rows > * + * {
-	margin-top: 1em;
+	margin-top: var(--gap-y);
 }
 
 #shapes {
-	width: 12em;
+	width: 16em;
 	height: 24em;
+	white-space: pre;
 }
 
 #width, #height {

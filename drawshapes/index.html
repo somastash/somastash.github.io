@@ -8,21 +8,33 @@
 </head>
 <body>
 	<div class="wrap">
-		<main></main>
-		<div class="ui rows">
-			<div class="canvas-size">
-				Canvas size:<br>
-				<input id="width" type="number"> x <input id="height" type="number">
+		<div class="cols">
+			<div class="ui rows left">
+				<div>
+					Canvas size:
+					<div class="mono">
+						<label>W <input id="width" type="number"></label><br>
+						<label>H <input id="height" type="number"></label>
+					</div>
+				</div>
 			</div>
-			<div>
-				<textarea id="shapes">
-				</textarea>
-			</div>
-			<div>
-				<button id="clear">CLEAR</button>
+
+			<main></main>
+
+			<div class="ui rows right">
+				<div class="rows">
+					<textarea id="shapes" onfocus="select()" class="mono"></textarea>
+					<div>
+						<label><input id="oneline" type="checkbox">One line</label>
+					</div>
+				</div>
+				<div>
+					<button id="clear">Clear All</button>
+				</div>
 			</div>
 		</div>
 	</div>
-	<script src="sketch.js"></script>
+
+	<script type="module" src="sketch.js"></script>
 </body>
 </html>
