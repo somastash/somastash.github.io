@@ -35,3 +35,17 @@ export function scaleShape(shapes, times) {
   }
   return r;
 }
+
+// 物体が指定範囲外かどうかを判定する
+export function isOutOfBounds(body, x, y, w, h) {
+  let v = body.vertices;
+  for (let i = 0; i < v.length; i++) {
+    let vx = v[i].x;
+    let vy = v[i].y;
+    if (vx < x || vx > (x + w) || vy < y || vy > (y + h)) {
+      return true;
+    }
+    return false;
+  }
+}
+
