@@ -5,7 +5,24 @@ html, body {
   padding: 0;
 }
 
-canvas {
-  display: block;
+body {
+	font-size: 20px;
+	font-family: Futura, Avenir, "Century Gothic", sans-serif;
+	text-align: center;
 }
 
+canvas {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+input {
+	margin-top: 1em;
+	margin-bottom: 1em;
+	font-size: 20px;
+}
+
+#save {
+  font-size: 32px;
+}

@@ -1,67 +1,83 @@
-// 1フレーム前のマウスの位置
-let px = 0;
-let py = 0;
+// Paint
 
-let sw = 5; // 線の太さ
+let px; // 前のフレームの x
+let py; // 前のフレームの y
 
-let colorInput; // カラーピッカーを入れる変数
-let dataInput; // テキストエリアを入れる変数
+let sw = 1; // 線の太さ
 
+let inputColor;  // 色選択 UI
+let inputWeight; // 太さ選択 UI
+let btnClear;    // 消去ボタン
+let btnSave;     // 保存ボタン
+
+// 最初の処理
 function setup() {
-	createCanvas(512, 512);
-	pixelDensity(1); // ピクセル深度
-	background(255); // 背景白
+  createCanvas(400, 400);
+  background(255);
 
-	let data = getItem('paint');
-	console.log('ロードしました', data);
-	decodePixels(data);
+  pixelDensity(1); // ピクセル深度 1
 
-	noFill();
+  let code = getItem('paint'); // 保存データをロード
+  decodePixels(code); // データを復号化
 
-	colorInput = select('#color'); // カラーピッカーを取得
-	dataInput = select('#data'); // テキストエリアを取得
+  inputColor = select('#color');   // 色選択 UI を取得
+  inputWeight = select('#weight'); // 太さ選択 UI を取得
+
+  btnClear = select('#clear');     // 消去ボタンを取得
+  btnClear.mousePressed(clearAll); // 消去関数の予約
+
+  btnSave = select('#save');       // 保存ボタンを取得
+  btnSave.mousePressed(saveImg);   // 保存関数の予約
+
+  update();
+
 }
 
+// フレーム毎の処理
 function draw() {
-	if (keyIsDown(70) && sw < 30) { // F キー
-		sw++; // 太くする
-	} else if (keyIsDown(68) && sw > 1) { // D キー
-		sw--; // 細くする
-	}
+  // background(220);
 
-	strokeWeight(sw); // 線の太さ
+  if ( keyIsPressed ) { // キーが押されていたら
+    if ( key == 'f' ) { // F キーが押されていたら線を太くする
+      sw += 2;
+    } else if ( key == 'd' ) { // D キーが押されていたら線を細くする
+      sw -= 2;
+    }
+  }
 
-	// マウスボタンを押している間
-	if (mouseIsPressed) {
-		stroke(colorInput.value()); // 線の色を変える
-		line(px, py, mouseX, mouseY);
-		px = mouseX;
-		py = mouseY;
-	}
+  sw = constrain(sw, 1, 100); // sw を 1 から 100 までの間で制限する
+
+  stroke(inputColor.value());        // 線の色
+  strokeWeight(sw); // 線の太さ
+
+  if ( mouseIsPressed ) { // もしクリック中なら
+    // 条件が true だったら実行
+    // 前のフレームの位置から
+    // 今のフレームの位置まで線を引く
+    line(px, py, mouseX, mouseY)
+    noStroke();
+  }
+  update();
 }
 
-// クリックした瞬間に実行される関数
-function mousePressed() {
-	point(mouseX, mouseY);
-	px = mouseX;
-	py = mouseY;
+// マウス座標を更新
+function update() {
+  px = mouseX;
+  py = mouseY;
 }
 
-// マウスボタンを放した時に実行される関数
+// 全消去の関数
+function clearAll() {
+  background(255); // 白で塗りつぶす
+}
+
+function saveImg() {
+  saveCanvas('paint.png'); // キャンバス保存
+}
+
 function mouseReleased() {
-	console.log('放しましたね？');
-	let data = encodePixels(); // 絵を文字列に変換
-	console.log(data);
-	storeItem('paint', data); // 文字列を保存
-}
-
-function encodeInput() {
-	console.log('エンコード！');
-	let data = encodePixels(); // 絵を文字列に変換
-	dataInput.value(data); // テキストエリアに文字列を入れる
-}
-
-function decodeInput() {
-	console.log('デコード！');
-	decodePixels(dataInput.value());
+  console.log('マウスを放しました。');
+  let code = encodePixels(); // キャンバスを符号化
+  console.log(code);
+  storeItem('paint', code); // 符号化データをブラウザに保存
 }

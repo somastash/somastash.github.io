@@ -8,16 +8,12 @@
   <script src="encode.js"></script>
 </head>
 <body>
-  <div class="wrap">
-	<main>
-	</main>
-	<div class="ui">
-		<input id="color" type="color">
-		<textarea id="data"></textarea>
-		<button onclick="encodeInput()">コードに変換</button>
-		<button onclick="decodeInput()">コードをキャンバスに反映</button>
-	</div>
-  </div>
+  <h1>ペイント</h1>
+  <main><!-- スケッチはここ --></main>
+  <input id="color" type="color">
+  <input id="weight" type="range" min="1" max="100">
+  <button id="clear">Clear</button>
+  <button id="save">Save</button>
   <script src="sketch.js"></script>
 </body>
 </html>
